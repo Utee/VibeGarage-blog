@@ -1,0 +1,36 @@
+---
+import { slugify } from '../utils/slugify';
+
+interface Props {
+	category: string;
+}
+
+const { category } = Astro.props;
+const slug = slugify(category);
+---
+
+<a href={`/blog/category/${slug}`} class="category-badge">
+	{category}
+</a>
+
+<style>
+	.category-badge {
+		display: inline-block;
+		background: var(--color-maroon);
+		color: #ffffff;
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.5px;
+		padding: 0.25rem 0.75rem;
+		border-radius: 4px;
+		text-decoration: none;
+		border: 1px solid rgba(243, 225, 120, 0.2);
+		transition: all 0.2s ease;
+	}
+
+	.category-badge:hover {
+		background: var(--color-gold);
+		color: #111111;
+		border-color: var(--color-gold);
+	}
+</style>

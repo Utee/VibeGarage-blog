@@ -1,49 +1,223 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import CategoryBadge from '../components/CategoryBadge.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import { getCollection } from 'astro:content';
+import { slugify } from '../utils/slugify';
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const categories = [
+	'Artist Growth',
+	'Music Marketing',
+	'Monetization',
+	'Streaming & Distribution',
+	'Tutorials & Guides',
+	'VibeGarage Updates',
+];
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<BaseHead title={`Blog | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
 	</head>
 	<body>
 		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This template
-				serves as a lightweight, minimally-styled starting point for anyone looking to build a personal
-				website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
+		<main class="container">
+			<section class="blog-hero">
+				<h1>VibeGarage Insights</h1>
+				<p>Guides, strategies, and updates for independent artists and creators.</p>
+			</section>
+
+			<!-- Category Filter Bar -->
+			<nav class="category-nav" aria-label="Blog Categories">
+				<span class="nav-label">Filter:</span>
+				<div class="category-pills">
+					<a href="/blog" class="pill active">All Posts</a>
+					{categories.map((cat) => (
+						<a href={`/blog/category/${slugify(cat)}`} class="pill">
+							{cat}
+						</a>
+					))}
+				</div>
+			</nav>
+
+			<!-- Posts Grid -->
+			<section class="posts-grid">
+				{posts.map((post) => (
+					<article class="post-card">
+						<a href={`/blog/${post.id}/`} class="card-link">
+							{post.data.heroImage && (
+								<img src={post.data.heroImage} alt={post.data.title} class="card-img" />
+							)}
+							<div class="card-body">
+								<div class="card-meta">
+									{post.data.category && (
+										<CategoryBadge category={post.data.category} />
+									)}
+									<span class="card-date">
+										<FormattedDate date={post.data.pubDate} />
+									</span>
+								</div>
+								<h2 class="card-title">{post.data.title}</h2>
+								<p class="card-desc">{post.data.description}</p>
+							</div>
+						</a>
+					</article>
+				))}
+			</section>
 		</main>
 		<Footer />
 	</body>
 </html>
+
+<style>
+	.container {
+		max-width: 960px;
+		margin: 0 auto;
+		padding: 3rem 1rem;
+	}
+
+	.blog-hero {
+		text-align: center;
+		margin-bottom: 2.5rem;
+	}
+
+	.blog-hero h1 {
+		font-size: 2.8rem;
+		color: #ffffff;
+		margin: 0 0 0.5rem 0;
+	}
+
+	.blog-hero p {
+		font-size: 1.15rem;
+		color: var(--color-text-muted);
+		margin: 0;
+	}
+
+	/* Category Filter Navigation */
+	.category-nav {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		margin-bottom: 2.5rem;
+		padding: 1rem;
+		background: var(--color-surface-dark);
+		border: 1px solid var(--color-surface-border);
+		border-radius: 8px;
+		overflow-x: auto;
+	}
+
+	.nav-label {
+		font-size: 0.85rem;
+		font-weight: 700;
+		color: var(--color-text-muted);
+		text-transform: uppercase;
+		letter-spacing: 1px;
+		white-space: nowrap;
+	}
+
+	.category-pills {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: nowrap;
+	}
+
+	.pill {
+		font-size: 0.85rem;
+		padding: 0.4rem 0.85rem;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid var(--color-surface-border);
+		border-radius: 20px;
+		color: var(--color-text-main);
+		text-decoration: none;
+		white-space: nowrap;
+		transition: all 0.2s ease;
+	}
+
+	.pill:hover {
+		border-color: var(--color-gold);
+		color: var(--color-gold);
+	}
+
+	.pill.active {
+		background: var(--color-gold);
+		color: #111111;
+		border-color: var(--color-gold);
+		font-weight: 700;
+	}
+
+	/* Posts Grid */
+	.posts-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+		gap: 1.5rem;
+	}
+
+	.post-card {
+		background: var(--color-surface-dark);
+		border: 1px solid var(--color-surface-border);
+		border-radius: 8px;
+		overflow: hidden;
+		transition: transform 0.2s ease, border-color 0.2s ease;
+	}
+
+	.post-card:hover {
+		transform: translateY(-3px);
+		border-color: var(--color-gold);
+	}
+
+	.card-link {
+		text-decoration: none;
+		color: inherit;
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+	}
+
+	.card-img {
+	width: 100%;
+	height: 200px;
+	object-fit: contain; 
+	background-color: #000000; 
+}
+
+	.card-body {
+		padding: 1.25rem;
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+	}
+
+	.card-meta {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 0.75rem;
+	}
+
+	.card-date {
+		font-size: 0.8rem;
+		color: var(--color-text-muted);
+	}
+
+	.card-title {
+		font-size: 1.2rem;
+		color: #ffffff;
+		margin: 0 0 0.5rem 0;
+		line-height: 1.35;
+	}
+
+	.card-desc {
+		font-size: 0.9rem;
+		color: var(--color-text-muted);
+		margin: 0;
+		line-height: 1.5;
+	}
+</style>
