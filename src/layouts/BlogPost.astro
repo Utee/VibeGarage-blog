@@ -17,11 +17,39 @@ const { title, description, pubDate, updatedDate, heroImage, category } = Astro.
 const rawContent = await Astro.slots.render('default');
 const wordCount = rawContent.replace(/<[^>]*>/g, '').split(/\s+/).length;
 const readingMinutes = Math.ceil(wordCount / 200);
+
+// Article JSON-LD Schema for Google Search
+const articleSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": title,
+  "description": description,
+  "image": heroImage ? [new URL(heroImage, Astro.site).href] : [],
+  "datePublished": pubDate ? pubDate.toISOString() : new Date().toISOString(),
+  "dateModified": updatedDate ? updatedDate.toISOString() : (pubDate ? pubDate.toISOString() : new Date().toISOString()),
+  "author": {
+    "@type": "Organization",
+    "name": "VibeGarage",
+    "url": "https://vibegarage.app"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "VibeGarage",
+    "url": "https://vibegarage.app"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": Astro.url.href
+  }
+});
 ---
 
 <html lang="en">
     <head>
         <BaseHead title={title} description={description} />
+        
+        <!-- JSON-LD Structured Data for Google Rich Search Snippets -->
+        <script type="application/ld+json" set:html={articleSchema} />
     </head>
 
     <body>
