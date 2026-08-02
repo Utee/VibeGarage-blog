@@ -48,3 +48,13 @@ const { title, description, image = '/logo.png' } = Astro.props;
 
 <!-- RSS Auto-Discovery -->
 <link rel="alternate" type="application/rss+xml" title={title} href={new URL('rss.xml', Astro.site)} />
+
+<!-- Google Analytics (GA4) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-11DFXVV86Z"></script>
+<script is:inline>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-11DFXVV86Z');
+</script>
